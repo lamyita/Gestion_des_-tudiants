@@ -1,10 +1,10 @@
 package sample;
 
-public class Specialite {
+public class Module {
     private Integer id;
     private String nom;
 
-    public Specialite(Integer id, String nom) {
+    public Module(Integer id, String nom) {
         this.id = id;
         this.nom = nom;
     }
