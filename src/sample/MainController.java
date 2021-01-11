@@ -21,27 +21,27 @@ public class MainController implements Initializable {
 
 
     @FXML
-    private TextField tfId;
+    private TextField tfCode;
     @FXML
-    private TextField tfTitle;
+    private TextField tfNom;
     @FXML
-    private TextField tfAuthor;
+    private TextField tfPrenom;
     @FXML
-    private TextField tfYear;
+    private TextField tfPhone;
     @FXML
-    private TextField tfPages;
+    private TextField tfEmail;
     @FXML
-    private TableView<Etudiant> tvBooks;
+    private TableView<Etudiant> tvEtudiant;
     @FXML
-    private TableColumn<Etudiant, Integer> colId;
+    private TableColumn<Etudiant, Integer> colCode;
     @FXML
-    private TableColumn<Etudiant, String> colTitle;
+    private TableColumn<Etudiant, String> colNom;
     @FXML
-    private TableColumn<Etudiant, String> colAuthor;
+    private TableColumn<Etudiant, String> colPrenom;
     @FXML
-    private TableColumn<Etudiant, Integer> colYear;
+    private TableColumn<Etudiant, Integer> colPhone;
     @FXML
-    private TableColumn<Etudiant, Integer> colPages;
+    private TableColumn<Etudiant, Integer> colEmail;
     @FXML
     private Button btnInsert;
     @FXML
@@ -53,12 +53,12 @@ public class MainController implements Initializable {
     private void handleButtonAction(ActionEvent event) {
 
         if(event.getSource() == btnInsert){
-            insertRecord();
+            insertEtudiant();
         }
         else if (event.getSource() == btnUpdate){
-            updateRecord();
+            modifierEtudiant();
         }else if(event.getSource() == btnDelete){
-            deleteButton();
+            deleteEtudiant();
         }
 
     }
@@ -66,7 +66,7 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-        showBooks();
+        viewEtudiant();
     }
 
     public Connection getConnection(){
@@ -80,8 +80,8 @@ public class MainController implements Initializable {
         }
     }
 
-    public ObservableList<Etudiant> getBooksList(){
-        ObservableList<Etudiant> bookList = FXCollections.observableArrayList();
+    public ObservableList<Etudiant> getEtudiantList(){
+        ObservableList<Etudiant> etudiantList = FXCollections.observableArrayList();
         Connection conn = getConnection();
         String query = "SELECT * FROM etudiant";
         Statement st;
@@ -95,43 +95,43 @@ public class MainController implements Initializable {
                 etudiant = new Etudiant(rs.getInt("code"), rs.getString("nom"),
                         rs.getString("prenom"), rs.getString("telephone"),
                         rs.getString("email"));
-                bookList.add(etudiant);
+                etudiantList.add(etudiant);
             }
 
         }catch(Exception ex){
             ex.printStackTrace();
         }
-        return bookList;
+        return etudiantList;
     }
 
-    public void showBooks(){
-        ObservableList<Etudiant> list = getBooksList();
+    public void viewEtudiant(){
+        ObservableList<Etudiant> list = getEtudiantList();
 
-        colId.setCellValueFactory(new PropertyValueFactory<Etudiant, Integer>("id"));
-        colTitle.setCellValueFactory(new PropertyValueFactory<Etudiant, String>("nom"));
-        colAuthor.setCellValueFactory(new PropertyValueFactory<Etudiant, String>("prenom"));
-        colYear.setCellValueFactory(new PropertyValueFactory<Etudiant, Integer>("phone"));
-        colPages.setCellValueFactory(new PropertyValueFactory<Etudiant, Integer>("email"));
+        colCode.setCellValueFactory(new PropertyValueFactory<Etudiant, Integer>("id"));
+        colNom.setCellValueFactory(new PropertyValueFactory<Etudiant, String>("nom"));
+        colPrenom.setCellValueFactory(new PropertyValueFactory<Etudiant, String>("prenom"));
+        colPhone.setCellValueFactory(new PropertyValueFactory<Etudiant, Integer>("phone"));
+        colEmail.setCellValueFactory(new PropertyValueFactory<Etudiant, Integer>("email"));
 
-        tvBooks.setItems(list);
+        tvEtudiant.setItems(list);
     }
 
-    private void insertRecord(){
-        String query = "INSERT INTO etudiant VALUES (" + tfId.getText() + ",'" + tfTitle.getText() + "','" + tfAuthor.getText() + "','"
-                + tfYear.getText() + " ', '"+ tfPages.getText() +"')";
+    private void insertEtudiant(){
+        String query = "INSERT INTO etudiant VALUES (" + tfCode.getText() + ",'" + tfNom.getText() + "','" + tfPrenom.getText() + "','"
+                + tfPhone.getText() + " ', '"+ tfEmail.getText() +"')";
         executeQuery(query);
-        showBooks();
+        viewEtudiant();
     }
-    private void updateRecord(){
-        String query = "UPDATE  etudiant SET nom  = '" + tfTitle.getText() + "', prenom = '" + tfAuthor.getText() + "', telephone = '"+
-                tfYear.getText() + "', email = '" + tfPages.getText() + "' WHERE code = " + tfId.getText() + "";
+    private void modifierEtudiant(){
+        String query = "UPDATE  etudiant SET nom  = '" + tfNom.getText() + "', prenom = '" + tfPrenom.getText() + "', telephone = '"+
+                tfPhone.getText() + "', email = '" + tfEmail.getText() + "' WHERE code = " + tfCode.getText() + "";
         executeQuery(query);
-        showBooks();
+        viewEtudiant();
     }
-    private void deleteButton(){
-        String query = "DELETE FROM etudiant WHERE code = '" + tfId.getText() + "' ";
+    private void deleteEtudiant(){
+        String query = "DELETE FROM etudiant WHERE code = '" + tfCode.getText() + "' ";
         executeQuery(query);
-        showBooks();
+        viewEtudiant();
     }
 
     private void executeQuery(String query) {
