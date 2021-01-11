@@ -19,7 +19,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 public class MainController implements Initializable {
 
-// tab Eudiants elements-----------
+// tab Eudiants elements-----------------------------------------------------------
     @FXML
     private TextField tfCode;
     @FXML
@@ -48,7 +48,7 @@ public class MainController implements Initializable {
     private Button btnUpdateEtudiant;
     @FXML
     private Button btnDeleteEtudiant;
-// tab Specialtes elements---------------------
+// tab Modules elements--------------------------------------------------
     @FXML
     private TextField tfCodeModule;
     @FXML
@@ -65,32 +65,62 @@ public class MainController implements Initializable {
     private Button btnUpdateModule;
     @FXML
     private Button btnDeleteModule;
-// Handle btns Methdos________________________________________
+//-------------------------------------------------------------------------------
+//tab Specialtes elements--------------------------------------------------------
+@FXML
+private TextField tfCodeSpecialite;
+@FXML
+private TextField tfNomSpecialite;
+@FXML
+private TableView<Specialite> tvSpecialite;
+@FXML
+private TableColumn<Specialite, Integer> colCodeSpecialite;
+@FXML
+private TableColumn<Specialite, String> colNomSpecialite;
+@FXML
+private Button btnInsertSpecialite;
+@FXML
+private Button btnUpdateSpecialite;
+@FXML
+private Button btnDeleteSpecialite;
+// Handle btns Methods____________________________________________________________
    @FXML
     private void handleButtonAction(ActionEvent event) {
 
         if(event.getSource() == btnInsertEtudiant){
             insertEtudiant();
-        }
-        else if (event.getSource() == btnUpdateEtudiant){
+        }else if(event.getSource()== btnUpdateEtudiant){
             modifierEtudiant();
-        }else if(event.getSource() == btnDeleteEtudiant){
+        }else if(event.getSource()== btnDeleteEtudiant){
             deleteEtudiant();
-        }else if(event.getSource() == btnInsertModule){
+        }else if(event.getSource()== btnInsertModule){
             insertModule();
-        }else if(event.getSource() == btnUpdateModule){
+        }else if(event.getSource()== btnUpdateModule){
             updateModule();
-        }else if(event.getSource() == btnDeleteModule){
+        }else if(event.getSource()== btnDeleteModule){
             deleteModule();
+        }else if(event.getSource()== btnInsertSpecialite){
+            insertSpecialite();
+        }else if(event.getSource()== btnUpdateSpecialite){
+            updateSpecialite();
+        }else if(event.getSource()== btnDeleteSpecialite){
+            deleteSpecialite();
+        }
+        else{
+            try {
+                event.getSource();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }
-//______________________
+//______________________----------------------------------------------------------
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         viewData();
     }
-//_____________________________Connection DataBase Method---------------------
+//_____________________________Connection DataBase Method-------------------------
     public Connection getConnection(){
         Connection conn;
         try{
@@ -127,7 +157,31 @@ public class MainController implements Initializable {
         }
         return etudiantsList;
     }
-//-----------------------------------
+//-------------------------------------------------------------------------------
+    //_________________Get Data From Table Etudiant to list of class E------------
+
+    public ObservableList<Specialite> getSpecialiteList(){
+        ObservableList<Specialite> specialitesList = FXCollections.observableArrayList();
+        Connection conn = getConnection();
+        String query = "SELECT * FROM specialte";
+        Statement st;
+        ResultSet rs;
+
+        try{
+            st = conn.createStatement();
+            rs = st.executeQuery(query);
+            Specialite specialite;
+            while(rs.next()){
+                specialite = new Specialite(rs.getInt("id_specialte"), rs.getString("nom_specialte"));
+                specialitesList.add(specialite);
+            }
+
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        return specialitesList;
+    }
+    //-------------------------------------------------------------------------------
     //_________________Get Data From Table Module to list of class M------------
     public ObservableList<Module> getModuleList(){
         ObservableList<Module> modulesList = FXCollections.observableArrayList();
@@ -150,28 +204,34 @@ public class MainController implements Initializable {
         }
         return modulesList;
     }
-    // view data in screen----------------------------
-    public void viewData(){
-        ObservableList<Etudiant> listEtudiant = getEtudiantList();
+//----------------------------------------------------------------------------------
 
+    // view data in screen-----------------------------------------------------------
+    public void viewData(){
+       //Transfert data from class Etudiant  to table Etudiant
+        ObservableList<Etudiant> listEtudiant = getEtudiantList();
         colCode.setCellValueFactory(new PropertyValueFactory<Etudiant, Integer>("id"));
         colNom.setCellValueFactory(new PropertyValueFactory<Etudiant, String>("nom"));
         colPrenom.setCellValueFactory(new PropertyValueFactory<Etudiant, String>("prenom"));
         colPhone.setCellValueFactory(new PropertyValueFactory<Etudiant, Integer>("phone"));
         colEmail.setCellValueFactory(new PropertyValueFactory<Etudiant, Integer>("email"));
-
         tvEtudiant.setItems(listEtudiant);
 
+        //Transfert data from class Module  to table Module
         ObservableList<Module> listModule = getModuleList();
-
         colCodeModule.setCellValueFactory(new PropertyValueFactory<Module, Integer>("id"));
         colNomModule.setCellValueFactory(new PropertyValueFactory<Module, String>("nom"));
-
-
         tvModule.setItems(listModule);
+
+        //Transfert data from class Specialite  to table Specialte
+        ObservableList<Specialite> listSpecialite = getSpecialiteList();
+        colCodeSpecialite.setCellValueFactory(new PropertyValueFactory<Specialite, Integer>("id"));
+        colNomSpecialite.setCellValueFactory(new PropertyValueFactory<Specialite, String>("nom"));
+        tvSpecialite.setItems(listSpecialite);
 
     }
 
+    // All Methods for Apply CRUD with Table module-----------------------------
     private void insertEtudiant(){
         String query = "INSERT INTO etudiant VALUES (" + tfCode.getText() + ",'" + tfNom.getText() + "','" + tfPrenom.getText() + "','"
                 + tfPhone.getText() + " ', '"+ tfEmail.getText() +"')";
@@ -189,13 +249,30 @@ public class MainController implements Initializable {
         executeQuery(query);
         viewData();
     }
-
-
-    private void insertModule(){
-        String query = "INSERT INTO module VALUES (" + tfCodeModule.getText() + ",'" + tfNomModule.getText() + "')";
+//-------------------------------------------------------------------------------
+    // All Methods for Apply CRUD with Table module
+    private void insertSpecialite(){
+        String query = "INSERT INTO specialte VALUES (" + tfCodeSpecialite.getText() + ",'" + tfNomSpecialite.getText() + "')";
         executeQuery(query);
         viewData();
     }
+    private void updateSpecialite(){
+        String query = "UPDATE  specialte SET nom_specialte  = '" + tfNomSpecialite.getText() + "'  WHERE id_specialte = '" + tfCodeSpecialite.getText() + "' ";
+        executeQuery(query);
+        viewData();
+    }
+    private void deleteSpecialite(){
+        String query = "DELETE FROM specialte WHERE id_specialte = '" + tfCodeSpecialite.getText() + "' ";
+        executeQuery(query);
+        viewData();
+    }
+//------------------------------------------------------------------------------
+ //-------------------------------------
+private void insertModule(){
+    String query = "INSERT INTO module VALUES (" + tfCodeModule.getText() + ",'" + tfNomModule.getText() + "')";
+    executeQuery(query);
+    viewData();
+}
     private void updateModule(){
         String query = "UPDATE  module SET nom_module  = '" + tfNomModule.getText() + "'  WHERE idmodule = '" + tfCodeModule.getText() + "' ";
         executeQuery(query);
@@ -206,7 +283,7 @@ public class MainController implements Initializable {
         executeQuery(query);
         viewData();
     }
-
+ //--------------------------------
     //Exuctions des Requetes
     private void executeQuery(String query) {
         Connection conn = getConnection();
